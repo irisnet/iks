@@ -113,8 +113,6 @@ func (s *Server) Sign(w http.ResponseWriter, r *http.Request) {
 		Sequence:      uint64(sequence),
 	})
 
-	println(string(sigBytes))
-
 	signedStdTx := auth.NewStdTx(stdTx.GetMsgs(), stdTx.Fee, sigs, stdTx.GetMemo())
 	out, err := cdc.MarshalJSON(signedStdTx)
 	if err != nil {
