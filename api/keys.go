@@ -6,9 +6,9 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/cosmos/cosmos-sdk/client/keys"
-	ckeys "github.com/cosmos/cosmos-sdk/crypto/keys"
-	"github.com/cosmos/cosmos-sdk/crypto/keys/keyerror"
+	"github.com/irisnet/irishub/crypto/keys"
+	ckeys "github.com/irisnet/irishub/client/keys"
+	"github.com/irisnet/irishub/crypto/keys/keyerror"
 	bip39 "github.com/cosmos/go-bip39"
 	"github.com/gorilla/mux"
 )
@@ -17,7 +17,7 @@ import (
 func (s *Server) GetKeys(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	kb, err := keys.NewKeyBaseFromDir(s.KeyDir)
+	kb, err := ckeys.GetKeyBaseFromDir(s.KeyDir)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write(newError(err).marshal())
@@ -77,7 +77,7 @@ func (ak AddNewKey) Marshal() []byte {
 func (s *Server) PostKeys(w http.ResponseWriter, r *http.Request) {
 	var m AddNewKey
 
-	kb, err := keys.NewKeyBaseFromDir(s.KeyDir)
+	kb, err := ckeys.GetKeyBaseFromDir(s.KeyDir)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write(newError(err).marshal())
@@ -107,7 +107,7 @@ func (s *Server) PostKeys(w http.ResponseWriter, r *http.Request) {
 	// if mnemonic is empty, generate one
 	mnemonic := m.Mnemonic
 	if mnemonic == "" {
-		_, mnemonic, _ = ckeys.NewInMemory().CreateMnemonic("inmemorykey", ckeys.English, "123456789", ckeys.Secp256k1)
+		_, mnemonic, _ = kb.CreateMnemonic("inmemorykey", keys.English, m.Password, keys.Secp256k1)
 	}
 
 	if !bip39.IsMnemonicValid(mnemonic) {
@@ -135,9 +135,9 @@ func (s *Server) PostKeys(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	account := uint32(m.Account)
-	index := uint32(m.Index)
-	info, err := kb.CreateAccount(m.Name, mnemonic, ckeys.DefaultBIP39Passphrase, m.Password, account, index)
+	//account := uint32(m.Account)
+	//index := uint32(m.Index)
+	info, err := kb.CreateKey(m.Name, mnemonic, m.Password)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write(newError(err).marshal())
@@ -151,7 +151,7 @@ func (s *Server) PostKeys(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	keyOutput.Mnemonic = mnemonic
+	keyOutput.Seed = mnemonic
 
 	out, err := json.Marshal(keyOutput)
 	if err != nil {
@@ -169,7 +169,7 @@ func (s *Server) PostKeys(w http.ResponseWriter, r *http.Request) {
 func (s *Server) GetKey(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	kb, err := keys.NewKeyBaseFromDir(s.KeyDir)
+	kb, err := ckeys.GetKeyBaseFromDir(s.KeyDir)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write(newError(err).marshal())
@@ -221,7 +221,7 @@ func (s *Server) GetKey(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-type bechKeyOutFn func(keyInfo ckeys.Info) (ckeys.KeyOutput, error)
+type bechKeyOutFn func(keyInfo keys.Info) (ckeys.KeyOutput, error)
 
 func getBechKeyOut(bechPrefix string) (bechKeyOutFn, error) {
 	switch bechPrefix {
@@ -256,7 +256,7 @@ func (s *Server) PutKey(w http.ResponseWriter, r *http.Request) {
 	name := vars["name"]
 	var m UpdateKeyBody
 
-	kb, err := keys.NewKeyBaseFromDir(s.KeyDir)
+	kb, err := ckeys.GetKeyBaseFromDir(s.KeyDir)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write(newError(err).marshal())
@@ -309,7 +309,7 @@ func (s *Server) DeleteKey(w http.ResponseWriter, r *http.Request) {
 	name := vars["name"]
 	var m DeleteKeyBody
 
-	kb, err := keys.NewKeyBaseFromDir(s.KeyDir)
+	kb, err := ckeys.GetKeyBaseFromDir(s.KeyDir)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write(newError(err).marshal())

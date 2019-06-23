@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/cosmos/cosmos-sdk/client/keys"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	txbldr "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder"
+	ckeys "github.com/irisnet/irishub/client/keys"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/auth"
+	txbldr "github.com/irisnet/irishub/client"
 )
 
 // SignBody is the body for a sign request
@@ -66,7 +66,7 @@ func (sb SignBody) StdSignMsg() (stdSign txbldr.StdSignMsg, stdTx auth.StdTx, er
 func (s *Server) Sign(w http.ResponseWriter, r *http.Request) {
 	var m SignBody
 
-	kb, err := keys.NewKeyBaseFromDir(s.KeyDir)
+	kb, err := ckeys.GetKeyBaseFromDir(s.KeyDir)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write(newError(err).marshal())

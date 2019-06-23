@@ -3,10 +3,10 @@ package api
 import (
 	"errors"
 
-	"github.com/cosmos/cosmos-sdk/cmd/gaia/app"
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gorilla/mux"
+	"github.com/irisnet/irishub/app"
+	"github.com/irisnet/irishub/codec"
+	sdk "github.com/irisnet/irishub/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 )
@@ -19,7 +19,7 @@ const (
 var cdc *codec.Codec
 
 func init() {
-	cdc = app.MakeCodec()
+	cdc = app.MakeLatestCodec()
 }
 
 // Server represents the API server

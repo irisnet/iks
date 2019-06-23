@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"strconv"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/bank"
+	sdk "github.com/irisnet/irishub/types"
+	"github.com/irisnet/irishub/modules/auth"
+	cbank "github.com/irisnet/irishub/client/bank"
 )
 
 // BankSendBody contains the necessary data to make a send transaction
@@ -56,9 +56,9 @@ func (s *Server) BankSend(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var fees sdk.Coins
+	var fees sdk.Coin
 	if sb.Fees != "" {
-		fees, err = sdk.ParseCoins(sb.Fees)
+		fees, err = sdk.ParseCoin(sb.Fees)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write(newError(fmt.Errorf("failed to parse fees %s into sdk.Coins", sb.Fees)).marshal())
@@ -67,7 +67,7 @@ func (s *Server) BankSend(w http.ResponseWriter, r *http.Request) {
 	}
 
 	stdTx := auth.NewStdTx(
-		[]sdk.Msg{bank.NewMsgSend(sb.Sender, sb.Reciever, coins)},
+		[]sdk.Msg{cbank.BuildBankSendMsg(sb.Sender, sb.Reciever, coins)},
 		auth.NewStdFee(20000, fees),
 		[]auth.StdSignature{{}},
 		sb.Memo,
@@ -93,7 +93,7 @@ func (s *Server) BankSend(w http.ResponseWriter, r *http.Request) {
 
 	stdTx = auth.NewStdTx(
 		stdTx.Msgs,
-		auth.NewStdFee(gas, stdTx.Fee.Amount),
+		auth.NewStdFee(gas, fees),
 		[]auth.StdSignature{},
 		stdTx.Memo,
 	)

@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jackzampolin/keyserver/api"
+	"github.com/irisnet/iks/api"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	yaml "gopkg.in/yaml.v2"
@@ -37,7 +37,7 @@ var configCmd = &cobra.Command{
 
 		s := api.Server{
 			Port:   3000,
-			KeyDir: fmt.Sprintf("%s/.keyserver", home),
+			KeyDir: fmt.Sprintf("%s/.iks", home),
 			Node:   "http://localhost:26657",
 		}
 

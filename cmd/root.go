@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jackzampolin/keyserver/api"
+	"github.com/irisnet/iks/api"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -43,8 +43,8 @@ var (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "keyserver",
-	Short: "A key managment server for high volume transaction signing",
+	Use:   "iks",
+	Short: "A key managment server for IRIS Hub",
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -58,7 +58,7 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.keyserver/config.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.iks/config.yaml)")
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
@@ -78,7 +78,7 @@ func initConfig() {
 		}
 
 		// viper.AddConfigPath(home)
-		viper.AddConfigPath(fmt.Sprintf("%s/.keyserver/", home))
+		viper.AddConfigPath(fmt.Sprintf("%s/.iks/", home))
 		viper.SetConfigName("config")
 	}
 

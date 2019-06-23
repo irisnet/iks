@@ -21,7 +21,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/jackzampolin/keyserver/api"
+	"github.com/irisnet/iks/api"
 	"github.com/spf13/cobra"
 )
 
