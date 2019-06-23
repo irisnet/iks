@@ -1,10 +1,10 @@
-BINARY            = keyserver
-GITHUB_USERNAME   = jackzampolin
+BINARY            = iks
+GITHUB_USERNAME   = irisnet
 DOCKER_REPO       = quay.io/jackzampolin
 VERSION           = v0.1.0
 GOARCH            = amd64
 ARTIFACT_DIR      = build
-PORT 							= 3000
+PORT              = 3000
 
 COMMIT=$(shell git rev-parse HEAD)
 BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
