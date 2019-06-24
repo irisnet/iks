@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 
 	"github.com/irisnet/irishub/client"
 	cbank "github.com/irisnet/irishub/client/bank"
@@ -91,7 +92,7 @@ func (s *Server) BankSend(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if sb.GasAdjustment == "" {
-		sb.GasAdjustment = "1.5"
+		sb.GasAdjustment = "1"
 	}
 	//if gas != 0 {
 	//	adj, err := strconv.ParseFloat(sb.GasAdjustment, 64)
@@ -102,6 +103,14 @@ func (s *Server) BankSend(w http.ResponseWriter, r *http.Request) {
 	//	}
 	//	gas = uint64(adj * float64(gas))
 	//}
+
+	adj, err := strconv.ParseFloat(sb.GasAdjustment, 64)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(newError(fmt.Errorf("failed to parse gasAdjustment %d into float64", sb.GasAdjustment)).marshal())
+		return
+	}
+	gas = uint64(adj * float64(gas))
 
 	stdTx = auth.NewStdTx(
 		stdTx.Msgs,
