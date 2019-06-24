@@ -7,9 +7,10 @@ import (
 	"net/http"
 	"strconv"
 
-	sdk "github.com/irisnet/irishub/types"
-	"github.com/irisnet/irishub/modules/auth"
+	"github.com/irisnet/irishub/client"
 	cbank "github.com/irisnet/irishub/client/bank"
+	"github.com/irisnet/irishub/modules/auth"
+	sdk "github.com/irisnet/irishub/types"
 )
 
 // BankSendBody contains the necessary data to make a send transaction
@@ -50,11 +51,14 @@ func (s *Server) BankSend(w http.ResponseWriter, r *http.Request) {
 	}
 
 	coins, err := sdk.ParseCoins(sb.Amount)
+
+	coins, err = Convert2MinUnitCoins(coins)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write(newError(fmt.Errorf("failed to parse amount %s into sdk.Coins", sb.Amount)).marshal())
 		return
 	}
+	sb.Amount = coins.String()
 
 	var fees sdk.Coin
 	if sb.Fees != "" {
@@ -64,6 +68,10 @@ func (s *Server) BankSend(w http.ResponseWriter, r *http.Request) {
 			w.Write(newError(fmt.Errorf("failed to parse fees %s into sdk.Coins", sb.Fees)).marshal())
 			return
 		}
+		if fees.Denom == sdk.IRIS.Name {
+			fees, err = sdk.IRIS.ConvertToMinCoin(fees.String())
+		}
+		sb.Fees = fees.String()
 	}
 
 	stdTx := auth.NewStdTx(
@@ -73,7 +81,9 @@ func (s *Server) BankSend(w http.ResponseWriter, r *http.Request) {
 		sb.Memo,
 	)
 
-	gas, err := s.SimulateGas(cdc.MustMarshalBinaryLengthPrefixed(stdTx))
+	//gas, err := s.SimulateGas(cdc.MustMarshalBinaryLengthPrefixed(stdTx))
+	// always use default gas
+	gas := uint64(client.DefaultGasLimit)
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -81,15 +91,26 @@ func (s *Server) BankSend(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if gas != 0 && sb.GasAdjustment != "" {
-		adj, err := strconv.ParseFloat(sb.GasAdjustment, 64)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write(newError(fmt.Errorf("failed to parse gasAdjustment %d into float64", sb.GasAdjustment)).marshal())
-			return
-		}
-		gas = uint64(adj * float64(gas))
+	if sb.GasAdjustment == "" {
+		sb.GasAdjustment = "1"
 	}
+	//if gas != 0 {
+	//	adj, err := strconv.ParseFloat(sb.GasAdjustment, 64)
+	//	if err != nil {
+	//		w.WriteHeader(http.StatusBadRequest)
+	//		w.Write(newError(fmt.Errorf("failed to parse gasAdjustment %d into float64", sb.GasAdjustment)).marshal())
+	//		return
+	//	}
+	//	gas = uint64(adj * float64(gas))
+	//}
+
+	adj, err := strconv.ParseFloat(sb.GasAdjustment, 64)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(newError(fmt.Errorf("failed to parse gasAdjustment %d into float64", sb.GasAdjustment)).marshal())
+		return
+	}
+	gas = uint64(adj * float64(gas))
 
 	stdTx = auth.NewStdTx(
 		stdTx.Msgs,
@@ -101,4 +122,16 @@ func (s *Server) BankSend(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write(cdc.MustMarshalJSON(stdTx))
 	return
+}
+
+func Convert2MinUnitCoins(coins sdk.Coins) (mincoins sdk.Coins, err error) {
+	for i, coin := range coins {
+		if coin.Denom == sdk.IRIS.Name {
+			coins[i], err = sdk.IRIS.ConvertToMinCoin(coin.String())
+			if err != nil {
+				return coins, err
+			}
+		}
+	}
+	return coins, err
 }

@@ -8,6 +8,7 @@ PORT              = 3000
 
 COMMIT=$(shell git rev-parse HEAD)
 BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
+NetworkType=mainnet
 
 # Symlink into GOPATH
 BUILD_DIR=${GOPATH}/src/github.com/${GITHUB_USERNAME}/${BINARY}
@@ -16,7 +17,8 @@ DOCKER_TAG=${VERSION}
 DOCKER_IMAGE=${DOCKER_REPO}/${BINARY}
 
 # Setup the -ldflags option for go build here, interpolate the variable values
-LDFLAGS = -ldflags "-X ${FLAG_PATH}.Version=${VERSION} -X ${FLAG_PATH}.Commit=${COMMIT} -X ${FLAG_PATH}.Branch=${BRANCH}"
+LDFLAGS = -ldflags "-X ${FLAG_PATH}.Version=${VERSION} -X ${FLAG_PATH}.Commit=${COMMIT} -X ${FLAG_PATH}.Branch=${BRANCH} \
+-X github.com/irisnet/irishub/types.NetworkType=${NetworkType}"
 
 # Build the project
 all: clean linux darwin

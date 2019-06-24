@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/irisnet/irishub/types"
 	"log"
 	"net/http"
 	"os"
@@ -23,6 +24,8 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/spf13/cobra"
 )
+
+var NetworkType = "mainnet"
 
 // serveCmd represents the serve command
 var serveCmd = &cobra.Command{
@@ -36,4 +39,5 @@ var serveCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(serveCmd)
+	types.SetNetworkType(NetworkType)
 }
