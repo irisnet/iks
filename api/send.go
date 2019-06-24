@@ -120,18 +120,6 @@ func (s *Server) BankSend(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func Convert2MinUnitCoins(coins sdk.Coins) (mincoins sdk.Coins, err error) {
-	for i, coin := range coins {
-		if coin.Denom == sdk.IRIS.Name {
-			coins[i], err = sdk.IRIS.ConvertToMinCoin(coin.String())
-			if err != nil {
-				return coins, err
-			}
-		}
-	}
-	return coins, err
-}
-
 func ParseCoins(coinsStr string) (coins sdk.Coins, err error) {
 	coinsStr = strings.TrimSpace(coinsStr)
 	if len(coinsStr) == 0 {
