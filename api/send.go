@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/irisnet/irishub/client"
 	cbank "github.com/irisnet/irishub/client/bank"
@@ -50,9 +51,7 @@ func (s *Server) BankSend(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	coins, err := sdk.ParseCoins(sb.Amount)
-
-	coins, err = Convert2MinUnitCoins(coins)
+	coins, err := ParseCoins(sb.Amount)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write(newError(fmt.Errorf("failed to parse amount %s into sdk.Coins", sb.Amount)).marshal())
@@ -62,14 +61,11 @@ func (s *Server) BankSend(w http.ResponseWriter, r *http.Request) {
 
 	var fees sdk.Coin
 	if sb.Fees != "" {
-		fees, err = sdk.ParseCoin(sb.Fees)
+		fees, err = ParseCoin(sb.Fees)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write(newError(fmt.Errorf("failed to parse fees %s into sdk.Coins", sb.Fees)).marshal())
 			return
-		}
-		if fees.Denom == sdk.IRIS.Name {
-			fees, err = sdk.IRIS.ConvertToMinCoin(fees.String())
 		}
 		sb.Fees = fees.String()
 	}
@@ -134,4 +130,42 @@ func Convert2MinUnitCoins(coins sdk.Coins) (mincoins sdk.Coins, err error) {
 		}
 	}
 	return coins, err
+}
+
+func ParseCoins(coinsStr string) (coins sdk.Coins, err error) {
+	coinsStr = strings.TrimSpace(coinsStr)
+	if len(coinsStr) == 0 {
+		return sdk.Coins{}, nil
+	}
+	coinStrs := strings.Split(coinsStr, ",")
+	coinMap := make(map[string]sdk.Coin)
+	for _, coinStr := range coinStrs {
+		coin, err := ParseCoin(coinStr)
+		if err != nil {
+			return sdk.Coins{}, err
+		}
+		if _, ok := coinMap[coin.Denom]; ok {
+			coinMap[coin.Denom] = coinMap[coin.Denom].Plus(coin)
+		} else {
+			coinMap[coin.Denom] = coin
+		}
+	}
+
+	for _, coin := range coinMap {
+		coins = append(coins, coin)
+	}
+	coins = coins.Sort()
+	return coins, nil
+}
+
+func ParseCoin(coinStr string) (minCoin sdk.Coin, err error) {
+	mainUnit, err := sdk.GetCoinName(coinStr)
+	if mainUnit == sdk.NativeTokenName {
+		coin, err := sdk.IRIS.ConvertToMinCoin(coinStr)
+		if err != nil {
+			return sdk.Coin{}, err
+		}
+		return coin, nil
+	}
+	return sdk.Coin{}, fmt.Errorf("unsupported coin type \"%s\"", mainUnit)
 }
