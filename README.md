@@ -16,6 +16,8 @@ POST    /tx/broadcast
 
 First, build and start the server:
 
+***For Testnet, please update [`NetworkType = "testnet"`](./cmd/serve.go#L28) manually***
+
 ```bash
 > make install
 > iks config
