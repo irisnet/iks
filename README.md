@@ -16,7 +16,7 @@ POST    /tx/broadcast
 
 First, build and start the server:
 
-***For Testnet, please update [`NetworkType = "testnet"`](./Makefile#L11) manually***
+***For Testnet, please update [`NetworkType=testnet`](./Makefile#L11) manually***
 
 ```bash
 > make install
