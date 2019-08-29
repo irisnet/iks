@@ -15,12 +15,12 @@ import (
 
 const (
 	sMenominc = "marine intact tone element chest certain school village sound guilt nothing deposit cart skirt unveil bulk unit dust peasant cannon faith lyrics swear regret"
-	sAcc      = "iaa1yv6alpum5r0nmnzkk4esp3cs5d58h8g9pevpk7"
-	sAccPub   = "iap1addwnpepqwf7vcxxzylpk4lgghqeyqdv4dwhh0htk5ukskqr7p383t8udzdkgz7cckk"
-	sVal      = "iva1yv6alpum5r0nmnzkk4esp3cs5d58h8g95gxwte"
-	sValPub   = ""
-	sCons     = "ica1yv6alpum5r0nmnzkk4esp3cs5d58h8g9as3xf6"
-	sConsPub  = ""
+	sAcc      = "faa1yv6alpum5r0nmnzkk4esp3cs5d58h8g9ek2ekr"
+	sAccPub   = "fap1addwnpepqwf7vcxxzylpk4lgghqeyqdv4dwhh0htk5ukskqr7p383t8udzdkgwgjl09"
+	sVal      = "fva1yv6alpum5r0nmnzkk4esp3cs5d58h8g9v8qkty"
+	sValPub   = "fvp1addwnpepqwf7vcxxzylpk4lgghqeyqdv4dwhh0htk5ukskqr7p383t8udzdkgddnsmw"
+	sCons     = "fca1yv6alpum5r0nmnzkk4esp3cs5d58h8g99lh7f8"
+	sConsPub  = "fcp1addwnpepqwf7vcxxzylpk4lgghqeyqdv4dwhh0htk5ukskqr7p383t8udzdkgljacuh"
 
 	testKey     = "jack"
 	testPass    = "123456789"
@@ -51,18 +51,18 @@ func TestGetKeys(t *testing.T) {
 
 	// test return bech val prefix
 	valKey := unmarshalKeyOutput(getRoute(t, fmt.Sprintf("%s/keys/jack?bech=val", server.URL), 200))
-	require.Equal(t, valKey.Address, sVal)
-	require.Equal(t, valKey.PubKey, sValPub)
+	require.Equal(t, sVal, valKey.Address)
+	require.Equal(t, sValPub, valKey.PubKey)
 
 	// test return bech cons prefix
 	consKey := unmarshalKeyOutput(getRoute(t, fmt.Sprintf("%s/keys/jack?bech=cons", server.URL), 200))
-	require.Equal(t, consKey.Address, sCons)
-	require.Equal(t, consKey.PubKey, sConsPub)
+	require.Equal(t, sCons, consKey.Address)
+	require.Equal(t, sConsPub, consKey.PubKey)
 
 	// TestGetKeys
 	keys := unmarshalKeysOutput(getRoute(t, fmt.Sprintf("%s/keys", server.URL), 200))
 	require.Equal(t, len(keys), 1)
-	require.Equal(t, keys[0].Name, testKey)
+	require.Equal(t, testKey, keys[0].Name)
 
 	// TestUpdateKey bad path
 	badUpdatePass := UpdateKeyBody{OldPassword: testKey, NewPassword: testPassAlt}
@@ -71,7 +71,7 @@ func TestGetKeys(t *testing.T) {
 
 	// TestUpdateKey happy path
 	updatePass := UpdateKeyBody{OldPassword: testPass, NewPassword: testPassAlt}
-	goodPass := putRoute(t, fmt.Sprintf("%s/keys/%s", server.URL, testKey), updatePass.Marshal(), 200)
+	goodPass := putRoute(t, fmt.Sprintf("%s/keys/%s", server.URL, testKey), updatePass.Marshal(), 204)
 	require.Empty(t, goodPass)
 
 	// Test delete key bad path
