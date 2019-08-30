@@ -46,7 +46,7 @@
     {
         "tx": "{tx-json}",
         "name": "{name}",
-        "passphrase": "{passphrase}",
+        "password": "{password}",
         "chain_id": "{chain_id}",
         "account_number": "{account_number}",
         "sequence": "{account_number}",
