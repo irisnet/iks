@@ -18,6 +18,9 @@ build
 # Ignore vendor directory
 vendor
 
+# Ignore go modules output file
+go.sum
+
 # Ignore testing directory
 test_data
 

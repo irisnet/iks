@@ -9,16 +9,17 @@ PORT              = 3000
 COMMIT=$(shell git rev-parse HEAD)
 BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
 NetworkType=mainnet
+# NetworkType=testnet
 
 # Symlink into GOPATH
-BUILD_DIR=${GOPATH}/src/github.com/${GITHUB_USERNAME}/${BINARY}
 FLAG_PATH=github.com/${GITHUB_USERNAME}/${BINARY}/cmd
 DOCKER_TAG=${VERSION}
 DOCKER_IMAGE=${DOCKER_REPO}/${BINARY}
 
 # Setup the -ldflags option for go build here, interpolate the variable values
 LDFLAGS = -ldflags "-X ${FLAG_PATH}.Version=${VERSION} -X ${FLAG_PATH}.Commit=${COMMIT} -X ${FLAG_PATH}.Branch=${BRANCH} \
--X github.com/irisnet/irishub/types.NetworkType=${NetworkType}"
+-X github.com/irisnet/irishub/types.NetworkType=${NetworkType} \
+-X github.com/irisnet/iks/cmd.NetworkType=${NetworkType}"
 
 # Build the project
 all: clean linux darwin
@@ -31,16 +32,12 @@ test:
 	go test -v ./api/...
 
 # Build binary for Linux
-linux: clean
-	cd ${BUILD_DIR}; \
+linux:
 	GOOS=linux GOARCH=${GOARCH} go build ${LDFLAGS} -o ${ARTIFACT_DIR}/${BINARY}-linux-${GOARCH} . ; \
-	cd - >/dev/null
 
 # Build binary for MacOS
 darwin:
-	cd ${BUILD_DIR}; \
 	GOOS=darwin GOARCH=${GOARCH} go build ${LDFLAGS} -o ${ARTIFACT_DIR}/${BINARY}-darwin-${GOARCH} . ; \
-	cd - >/dev/null
 
 # Build binary for Windows
 windows:
@@ -79,8 +76,6 @@ docker-run:
 
 # Remove all the built binaries
 clean:
-	cd ${BUILD_DIR} >/dev/null
-	rm -rf ${ARTIFACT_DIR}/*
-	cd - >/dev/null
+	rm -fr ${ARTIFACT_DIR}
 
 .PHONY: linux darwin fmt clean
