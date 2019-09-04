@@ -146,7 +146,7 @@ var txSign = &cobra.Command{
 
 		postData := api.SignBody{
 			Name:          args[0],
-			Passphrase:    args[1],
+			Password:      args[1],
 			ChainID:       args[2],
 			AccountNumber: args[3],
 			Sequence:      args[4],

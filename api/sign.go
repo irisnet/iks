@@ -14,7 +14,7 @@ import (
 type SignBody struct {
 	Tx            json.RawMessage `json:"tx"`
 	Name          string          `json:"name"`
-	Passphrase    string          `json:"passphrase"`
+	Password      string          `json:"password"`
 	ChainID       string          `json:"chain_id"`
 	AccountNumber string          `json:"account_number"`
 	Sequence      string          `json:"sequence"`
@@ -85,7 +85,7 @@ func (s *Server) Sign(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sigBytes, pubkey, err := kb.Sign(m.Name, m.Passphrase, stdSign)
+	sigBytes, pubkey, err := kb.Sign(m.Name, m.Password, stdSign)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write(newError(err).marshal())

@@ -44,9 +44,9 @@
 - Request body:
     ```json
     {
-        "tx": "{tx-json}",
+        "tx": "{tx_json}",
         "name": "{name}",
-        "passphrase": "{passphrase}",
+        "password": "{password}",
         "chain_id": "{chain_id}",
         "account_number": "{account_number}",
         "sequence": "{account_number}",
@@ -59,10 +59,10 @@
 - Request body:
     ```json
     {
-        "sender": "{sender-address}",
-        "reciever": "{reciever-address}",
+        "sender": "{sender_address}",
+        "reciever": "{reciever_address}",
         "amount": "{amount}",
-        "chain-id": "{chain-id}",
+        "chain_id": "{chain_id}",
         "memo": "{memo/empty}",
         "fees": "{fees}",
         "gas_adjustment": "{gas_adjustment/empty}"

@@ -19,7 +19,7 @@ type BankSendBody struct {
 	Sender        sdk.AccAddress `json:"sender"`
 	Reciever      sdk.AccAddress `json:"reciever"`
 	Amount        string         `json:"amount"`
-	ChainID       string         `json:"chain-id"`
+	ChainID       string         `json:"chain_id"`
 	Memo          string         `json:"memo,omitempty"`
 	Fees          string         `json:"fees,omitempty"`
 	GasAdjustment string         `json:"gas_adjustment,omitempty"`
