@@ -1,7 +1,7 @@
 BINARY            = iks
 GITHUB_USERNAME   = irisnet
 DOCKER_REPO       = quay.io/jackzampolin
-VERSION           = v0.1.0
+VERSION           = v0.1.2
 GOARCH            = amd64
 ARTIFACT_DIR      = build
 PORT              = 3000
