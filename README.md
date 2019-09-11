@@ -42,7 +42,7 @@ curl http://localhost:3000/version | jq
 
 # Response:
 {
-   "version":"v0.1.0",
+   "version":"v0.1.2",
    "commit":"a913b97cb1210643271f6ca81ef0b1c625d79e41",
    "branch":"master"
 }
