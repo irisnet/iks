@@ -133,7 +133,7 @@ func ParseCoins(coinsStr string) (coins sdk.Coins, err error) {
 			return sdk.Coins{}, err
 		}
 		if _, ok := coinMap[coin.Denom]; ok {
-			coinMap[coin.Denom] = coinMap[coin.Denom].Plus(coin)
+			coinMap[coin.Denom] = coinMap[coin.Denom].Add(coin)
 		} else {
 			coinMap[coin.Denom] = coin
 		}
@@ -148,8 +148,8 @@ func ParseCoins(coinsStr string) (coins sdk.Coins, err error) {
 
 func ParseCoin(coinStr string) (minCoin sdk.Coin, err error) {
 	mainUnit, err := sdk.GetCoinName(coinStr)
-	if mainUnit == sdk.NativeTokenName {
-		coin, err := sdk.IRIS.ConvertToMinCoin(coinStr)
+	if mainUnit == sdk.Iris {
+		coin, err := sdk.IrisCoinType.ConvertToMinDenomCoin(coinStr)
 		if err != nil {
 			return sdk.Coin{}, err
 		}

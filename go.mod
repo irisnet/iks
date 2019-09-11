@@ -12,7 +12,7 @@ require (
 	github.com/gorilla/handlers v1.4.0
 	github.com/gorilla/mux v1.7.0
 	github.com/gorilla/websocket v1.4.0 // indirect
-	github.com/irisnet/irishub v0.14.4
+	github.com/irisnet/irishub v0.15.1
 	github.com/jmhodges/levigo v1.0.0 // indirect
 	github.com/mattn/go-isatty v0.0.7 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
@@ -26,7 +26,7 @@ require (
 	github.com/spf13/viper v1.0.3
 	github.com/stretchr/testify v1.2.2
 	github.com/syndtr/goleveldb v1.0.0 // indirect
-	github.com/tendermint/tendermint v0.28.0
+	github.com/tendermint/tendermint v0.31.0
 	golang.org/x/sys v0.0.0-20190329044733-9eb1bfa1ce65 // indirect
 	google.golang.org/genproto v0.0.0-20190327125643-d831d65fe17d // indirect
 	google.golang.org/grpc v1.19.1 // indirect
@@ -34,7 +34,7 @@ require (
 )
 
 replace (
-	github.com/tendermint/iavl => github.com/irisnet/iavl v0.12.0
-	github.com/tendermint/tendermint => github.com/irisnet/tendermint v0.28.0
+	github.com/tendermint/iavl => github.com/irisnet/iavl v0.12.2
+	github.com/tendermint/tendermint => github.com/irisnet/tendermint v0.31.0
 	golang.org/x/crypto => github.com/tendermint/crypto v0.0.0-20180820045704-3764759f34a5
 )
