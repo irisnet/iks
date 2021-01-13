@@ -21,8 +21,8 @@ import (
 	"log"
 	"net/http"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/irisnet/iks/api"
-	sdk "github.com/irisnet/irishub/types"
 	"github.com/spf13/cobra"
 )
 

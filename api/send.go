@@ -8,10 +8,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/irisnet/irishub/client"
-	cbank "github.com/irisnet/irishub/client/bank"
-	"github.com/irisnet/irishub/modules/auth"
-	sdk "github.com/irisnet/irishub/types"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 )
 
 // BankSendBody contains the necessary data to make a send transaction
@@ -59,9 +59,9 @@ func (s *Server) BankSend(w http.ResponseWriter, r *http.Request) {
 	}
 	sb.Amount = coins.String()
 
-	var fees sdk.Coin
+	var fees sdk.Coins
 	if sb.Fees != "" {
-		fees, err = ParseCoin(sb.Fees)
+		fees, err = ParseCoins(sb.Fees)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write(newError(fmt.Errorf("failed to parse fees %s into sdk.Coins", sb.Fees)).marshal())
@@ -70,16 +70,16 @@ func (s *Server) BankSend(w http.ResponseWriter, r *http.Request) {
 		sb.Fees = fees.String()
 	}
 
-	stdTx := auth.NewStdTx(
-		[]sdk.Msg{cbank.BuildBankSendMsg(sb.Sender, sb.Reciever, coins)},
-		auth.NewStdFee(20000, fees),
-		[]auth.StdSignature{{}},
+	stdTx := legacytx.NewStdTx(
+		[]sdk.Msg{banktypes.NewMsgSend(sb.Sender, sb.Reciever, coins)},
+		legacytx.NewStdFee(20000, fees),
+		[]legacytx.StdSignature{{}},
 		sb.Memo,
 	)
 
 	//gas, err := s.SimulateGas(cdc.MustMarshalBinaryLengthPrefixed(stdTx))
 	// always use default gas
-	gas := uint64(client.DefaultGasLimit)
+	gas := uint64(flags.DefaultGasLimit)
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -108,10 +108,10 @@ func (s *Server) BankSend(w http.ResponseWriter, r *http.Request) {
 	}
 	gas = uint64(adj * float64(gas))
 
-	stdTx = auth.NewStdTx(
+	stdTx = legacytx.NewStdTx(
 		stdTx.Msgs,
-		auth.NewStdFee(gas, fees),
-		[]auth.StdSignature{},
+		legacytx.NewStdFee(gas, stdTx.Fee.Amount),
+		[]legacytx.StdSignature{},
 		stdTx.Memo,
 	)
 
@@ -147,13 +147,14 @@ func ParseCoins(coinsStr string) (coins sdk.Coins, err error) {
 }
 
 func ParseCoin(coinStr string) (minCoin sdk.Coin, err error) {
-	mainUnit, err := sdk.GetCoinName(coinStr)
-	if mainUnit == sdk.Iris {
-		coin, err := sdk.IrisCoinType.ConvertToMinDenomCoin(coinStr)
-		if err != nil {
-			return sdk.Coin{}, err
-		}
+	coin, err := sdk.ParseCoinNormalized(coinStr)
+	if err != nil {
+		return sdk.Coin{}, err
+	}
+	if coin.Denom == "iris" {
+		coin.Amount = coin.Amount.Mul(sdk.NewInt(1000000))
+		coin.Denom = "uiris"
 		return coin, nil
 	}
-	return sdk.Coin{}, fmt.Errorf("unsupported coin type \"%s\"", mainUnit)
+	return coin, nil
 }
