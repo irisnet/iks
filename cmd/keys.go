@@ -42,10 +42,7 @@ var keysGet = &cobra.Command{
 			log.Fatalf("error fetching %s", url)
 			return
 		}
-		if resp.StatusCode != 200 {
-			log.Fatalf("non 200 respose code")
-			return
-		}
+
 		out, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			log.Fatalf("failed reading response body")
@@ -74,10 +71,7 @@ var keysPost = &cobra.Command{
 			log.Fatalf("error fetching %s", url)
 			return
 		}
-		if resp.StatusCode != 200 {
-			log.Fatalf("non 200 respose code")
-			return
-		}
+
 		out, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			log.Fatalf("failed reading response body")
@@ -99,10 +93,7 @@ var keyGet = &cobra.Command{
 			log.Fatalf("error fetching %s", url)
 			return
 		}
-		if resp.StatusCode != 200 {
-			log.Fatalf("non 200 respose code")
-			return
-		}
+
 		out, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			log.Fatalf("failed reading response body")
@@ -131,10 +122,7 @@ var keyPut = &cobra.Command{
 			log.Fatalf("error fetching %s", url)
 			return
 		}
-		if resp.StatusCode != 204 {
-			log.Fatalf("non 204 respose code %d", resp.StatusCode)
-			return
-		}
+
 		out, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			log.Fatalf("failed reading response body")
@@ -163,10 +151,7 @@ var keyDelete = &cobra.Command{
 			log.Fatalf("error fetching %s", url)
 			return
 		}
-		if resp.StatusCode != 200 {
-			log.Fatalf("non 200 respose code %d", resp.StatusCode)
-			return
-		}
+
 		out, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			log.Fatalf("failed reading response body")

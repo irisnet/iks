@@ -15,7 +15,6 @@ import (
 
 var (
 	KeyringServiceName = "iris"
-	coinType           = 118
 	Kb                 LegacyKeybase
 )
 
@@ -99,12 +98,12 @@ func (s *Server) PostKeys(w http.ResponseWriter, r *http.Request) {
 	// if mnemonic is empty, generate one
 	mnemonic := m.Mnemonic
 	if mnemonic == "" {
-		_, mnemonic, _ = cryptokeyring.NewInMemory().NewMnemonic("inmemorykey", cryptokeyring.English, "123456789", hd.Secp256k1)
+		_, mnemonic, _ = cryptokeyring.NewInMemory().NewMnemonic("inmemorykey", cryptokeyring.English, FullFundraiserPath, hd.Secp256k1)
 	}
 
 	if !bip39.IsMnemonicValid(mnemonic) {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write(newError(fmt.Errorf("invalid mnemonic")).marshal())
+		w.Write(newError(fmt.Errorf("invalid mnemonic %s", mnemonic)).marshal())
 		return
 	}
 
