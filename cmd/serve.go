@@ -21,6 +21,7 @@ import (
 	"os"
 
 	"github.com/gorilla/handlers"
+	"github.com/irisnet/iks/api"
 	"github.com/spf13/cobra"
 )
 
@@ -30,6 +31,12 @@ var serveCmd = &cobra.Command{
 	Short: "Runs the server",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Println(fmt.Sprintf("Listening on port ':%v'...", server.Port))
+		var err error
+		api.Kb, err = api.NewLegacy(api.KeyringServiceName, server.KeyDir, nil)
+		if err != nil {
+			panic(err)
+		}
+
 		log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", server.Port), handlers.LoggingHandler(os.Stdout, server.Router())))
 	},
 }

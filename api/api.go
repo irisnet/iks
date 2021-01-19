@@ -6,14 +6,16 @@ import (
 	"strings"
 
 	"github.com/gogo/protobuf/jsonpb"
-	"github.com/irisnet/irishub/app"
-
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gorilla/mux"
+
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 	rpchttp "github.com/tendermint/tendermint/rpc/client/http"
+
+	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/irisnet/irishub/app"
 )
 
 const (
@@ -25,6 +27,11 @@ var cdc *codec.LegacyAmino
 
 func init() {
 	_, cdc = app.MakeCodecs()
+	cdc.RegisterInterface((*Info)(nil), nil)
+	cdc.RegisterConcrete(localInfo{}, "crypto/keys/localInfo", nil)
+	cdc.RegisterConcrete(ledgerInfo{}, "crypto/keys/ledgerInfo", nil)
+	cdc.RegisterConcrete(offlineInfo{}, "crypto/keys/offlineInfo", nil)
+	cdc.RegisterConcrete(multiInfo{}, "crypto/keys/multiInfo", nil)
 }
 
 // Server represents the API server

@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
 )
 
@@ -63,13 +62,6 @@ func (sb SignBody) StdSignMsg() (stdSign legacytx.StdSignMsg, stdTx legacytx.Std
 func (s *Server) Sign(w http.ResponseWriter, r *http.Request) {
 	var m SignBody
 
-	kb, err := keyring.New(KeyringServiceName, keyring.BackendFile, s.KeyDir, nil)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(newError(err).marshal())
-		return
-	}
-
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -91,7 +83,7 @@ func (s *Server) Sign(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sigBytes, pubkey, err := kb.Sign(m.Name, legacytx.StdSignBytes(stdSign.ChainID,
+	sigBytes, pubkey, err := Kb.Sign(m.Name, m.Password, legacytx.StdSignBytes(stdSign.ChainID,
 		stdSign.AccountNumber, stdSign.Sequence, stdSign.TimeoutHeight,
 		stdSign.Fee, stdSign.Msgs, stdSign.Memo))
 

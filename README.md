@@ -193,7 +193,7 @@ In another window, generate the transaction to sign, sign it and broadcast:
 
 # Search for the transaction which has the same hash in all existing blocks
 # iriscli tendermint tx [hash] [flags]
-> iriscli tendermint tx 84CEF8B7FD04DA6FE9C22A6077D8286FA7775CAA0BB06D1D875AE9527A3D15CB --trust-node
+> iris q tx 84CEF8B7FD04DA6FE9C22A6077D8286FA7775CAA0BB06D1D875AE9527A3D15CB
 ```
 
 

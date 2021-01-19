@@ -5,11 +5,13 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	rpchttp "github.com/tendermint/tendermint/rpc/client/http"
+
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
+
 	"github.com/irisnet/irishub/app"
-	rpchttp "github.com/tendermint/tendermint/rpc/client/http"
 )
 
 var txconfig = app.MakeEncodingConfig().TxConfig
