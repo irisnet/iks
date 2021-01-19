@@ -17,9 +17,7 @@ DOCKER_TAG=${VERSION}
 DOCKER_IMAGE=${DOCKER_REPO}/${BINARY}
 
 # Setup the -ldflags option for go build here, interpolate the variable values
-LDFLAGS = -ldflags "-X ${FLAG_PATH}.Version=${VERSION} -X ${FLAG_PATH}.Commit=${COMMIT} -X ${FLAG_PATH}.Branch=${BRANCH} \
--X github.com/irisnet/irishub/types.NetworkType=${NetworkType} \
--X github.com/irisnet/iks/cmd.NetworkType=${NetworkType}"
+LDFLAGS = -ldflags "-X ${FLAG_PATH}.Version=${VERSION} -X ${FLAG_PATH}.Commit=${COMMIT} -X ${FLAG_PATH}.Branch=${BRANCH}"
 
 # Build the project
 all: clean linux darwin

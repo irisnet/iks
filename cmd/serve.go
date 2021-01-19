@@ -16,16 +16,14 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/irisnet/irishub/types"
 	"log"
 	"net/http"
 	"os"
 
 	"github.com/gorilla/handlers"
+	"github.com/irisnet/iks/api"
 	"github.com/spf13/cobra"
 )
-
-var NetworkType = "mainnet"
 
 // serveCmd represents the serve command
 var serveCmd = &cobra.Command{
@@ -33,11 +31,16 @@ var serveCmd = &cobra.Command{
 	Short: "Runs the server",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Println(fmt.Sprintf("Listening on port ':%v'...", server.Port))
+		var err error
+		api.Kb, err = api.NewLegacy(api.KeyringServiceName, server.KeyDir, nil)
+		if err != nil {
+			panic(err)
+		}
+
 		log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", server.Port), handlers.LoggingHandler(os.Stdout, server.Router())))
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(serveCmd)
-	types.SetNetworkType(NetworkType)
 }

@@ -145,9 +145,9 @@ You can use the mnemonics to create keys in `iriscli` as well.
 # iks keys post [name] [password] | jq
 > iks keys post jill foobarbaz | jq
 
-# Save the mnemonic from the above command and add it to iriscli
-# iriscli keys add [name] --recover
-> iriscli keys add jack --recover
+# Save the mnemonic from the above command and add it to iris
+# iris keys add [name] --recover
+> iris keys add jack --recover
 ```
 
 Next create a single node testnet. If any question else, you can refer to the following documents:
@@ -156,20 +156,21 @@ Next create a single node testnet. If any question else, you can refer to the fo
 
 ```bash
 # Initialize the configuration files such as genesis.json and config.toml
-# iris init --moniker [node-name] --chain-id [chain-id]
-> iris init --moniker JackNode --chain-id iksnet
+# iris init [node-name] --chain-id [chain-id]
+> iris init JackNode --chain-id iksnet
 
 # Use the following command to modify the genesis.json file to assign the initial account balance to the above validator operator account
 # iris add-genesis-account [account-address] 10000000000iris
-> iris add-genesis-account $(iks keys show jack | jq -r .address) 10000000000iris
-> iris add-genesis-account $(iks keys show jill | jq -r .address) 100000000iris
+> iris add-genesis-account $(iks keys show jack | jq -r .address) 10000000000000000uiris
+> iris add-genesis-account $(iks keys show jill | jq -r .address) 100000000000000uiris
 
 # Create the CreateValidator transaction and sign the transaction by the validator operator account
-# iris gentx --name [name]
-> iris gentx --name jack
+# iris gentx [name] [amount]
+> iris gentx jack 100000000uiris --chain-id iksnet
 
 # Configuring validator information
 > iris collect-gentxs
+> sed -i '' 's/stake/uiris/g' $HOME/.iris/config/genesis.json
 > iris start
 ```
 
@@ -193,7 +194,7 @@ In another window, generate the transaction to sign, sign it and broadcast:
 
 # Search for the transaction which has the same hash in all existing blocks
 # iriscli tendermint tx [hash] [flags]
-> iriscli tendermint tx 84CEF8B7FD04DA6FE9C22A6077D8286FA7775CAA0BB06D1D875AE9527A3D15CB --trust-node
+> iris q tx 84CEF8B7FD04DA6FE9C22A6077D8286FA7775CAA0BB06D1D875AE9527A3D15CB
 ```
 
 

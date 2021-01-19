@@ -9,7 +9,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	ckeys "github.com/irisnet/irishub/client/keys"
+	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/stretchr/testify/require"
 )
 
@@ -93,7 +93,7 @@ func unmarshalError(in []byte) (out restError) {
 	return
 }
 
-func unmarshalKeyOutput(ko []byte) (out ckeys.KeyOutput) {
+func unmarshalKeyOutput(ko []byte) (out keyring.KeyOutput) {
 	err := json.Unmarshal(ko, &out)
 	if err != nil {
 		panic(err)
@@ -101,7 +101,7 @@ func unmarshalKeyOutput(ko []byte) (out ckeys.KeyOutput) {
 	return
 }
 
-func unmarshalKeysOutput(ko []byte) (out []ckeys.KeyOutput) {
+func unmarshalKeysOutput(ko []byte) (out []keyring.KeyOutput) {
 	err := json.Unmarshal(ko, &out)
 	if err != nil {
 		panic(err)

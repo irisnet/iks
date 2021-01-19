@@ -1,14 +1,21 @@
 package api
 
 import (
+	"context"
 	"errors"
+	"strings"
 
+	"github.com/gogo/protobuf/jsonpb"
 	"github.com/gorilla/mux"
-	"github.com/irisnet/irishub/app"
-	"github.com/irisnet/irishub/codec"
-	sdk "github.com/irisnet/irishub/types"
-	cmn "github.com/tendermint/tendermint/libs/common"
+
+	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
+	rpchttp "github.com/tendermint/tendermint/rpc/client/http"
+
+	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/irisnet/irishub/app"
 )
 
 const (
@@ -16,10 +23,15 @@ const (
 	maxValidIndexalue    = int(0x80000000 - 1)
 )
 
-var cdc *codec.Codec
+var cdc *codec.LegacyAmino
 
 func init() {
-	cdc = app.MakeLatestCodec()
+	_, cdc = app.MakeCodecs()
+	cdc.RegisterInterface((*Info)(nil), nil)
+	cdc.RegisterConcrete(localInfo{}, "crypto/keys/localInfo", nil)
+	cdc.RegisterConcrete(ledgerInfo{}, "crypto/keys/ledgerInfo", nil)
+	cdc.RegisterConcrete(offlineInfo{}, "crypto/keys/offlineInfo", nil)
+	cdc.RegisterConcrete(multiInfo{}, "crypto/keys/multiInfo", nil)
 }
 
 // Server represents the API server
@@ -52,9 +64,13 @@ func (s *Server) Router() *mux.Router {
 
 // SimulateGas simulates gas for a transaction
 func (s *Server) SimulateGas(txbytes []byte) (res uint64, err error) {
-	result, err := rpcclient.NewHTTP(s.Node, "/websocket").ABCIQueryWithOptions(
+	client, err := rpchttp.New(s.Node, "/websocket")
+	if err != nil {
+		return
+	}
+	result, err := client.ABCIQueryWithOptions(context.Background(),
 		"/app/simulate",
-		cmn.HexBytes(txbytes),
+		tmbytes.HexBytes(txbytes),
 		rpcclient.ABCIQueryOptions{},
 	)
 
@@ -66,8 +82,8 @@ func (s *Server) SimulateGas(txbytes []byte) (res uint64, err error) {
 		return 0, errors.New(result.Response.Log)
 	}
 
-	var simulationResult sdk.Result
-	if err := cdc.UnmarshalBinaryLengthPrefixed(result.Response.Value, &simulationResult); err != nil {
+	var simulationResult sdk.SimulationResponse
+	if err := jsonpb.Unmarshal(strings.NewReader(string(result.Response.Value)), &simulationResult); err != nil {
 		return 0, err
 	}
 

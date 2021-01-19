@@ -1,15 +1,23 @@
 package api
 
 import (
+	"context"
 	"io/ioutil"
 	"net/http"
 
-	"github.com/irisnet/irishub/modules/auth"
-	rpcclient "github.com/tendermint/tendermint/rpc/client"
+	rpchttp "github.com/tendermint/tendermint/rpc/client/http"
+
+	"github.com/cosmos/cosmos-sdk/client/tx"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
+
+	"github.com/irisnet/irishub/app"
 )
 
+var txconfig = app.MakeEncodingConfig().TxConfig
+
 func (s *Server) Broadcast(w http.ResponseWriter, r *http.Request) {
-	var stdTx auth.StdTx
+	var stdTx legacytx.StdTx
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -24,14 +32,20 @@ func (s *Server) Broadcast(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	txBytes, err := cdc.MarshalBinaryLengthPrefixed(stdTx)
+	txBytes, err := tx.ConvertAndEncodeStdTx(txconfig, stdTx)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write(newError(err).marshal())
 		return
 	}
 
-	res, err := rpcclient.NewHTTP(s.Node, "/websocket").BroadcastTxSync(txBytes)
+	client, err := rpchttp.New(s.Node, "/websocket")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(newError(err).marshal())
+		return
+	}
+	res, err := client.BroadcastTxSync(context.Background(), txBytes)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write(newError(err).marshal())
@@ -39,6 +53,6 @@ func (s *Server) Broadcast(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write(cdc.MustMarshalJSON(NewResponseFormatBroadcastTx(res)))
+	w.Write(cdc.MustMarshalJSON(sdk.NewResponseFormatBroadcastTx(res)))
 	return
 }
